@@ -1,0 +1,3 @@
+[mysqld]
+skip-name-resolve=OFF
+bind-address = 0.0.0.0
