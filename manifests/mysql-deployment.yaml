@@ -42,6 +42,9 @@ spec:
         - name: mysql-config
           mountPath: /etc/mysql/conf.d/z-custom.cnf # Mount as a file, not a directory
           subPath: z-custom.cnf # Must match the ConfigMap key
+        - name: mysql-initdb
+          mountPath: /docker-entrypoint-initdb.d/init.sql
+          subPath: init.sql
       volumes:
       - name: mysql-storage
         persistentVolumeClaim:
@@ -49,3 +52,6 @@ spec:
       - name: mysql-config
         configMap:
           name: mysql-custom-config
+      - name: mysql-initdb
+        configMap:
+          name: mysql-initdb-config
