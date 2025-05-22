@@ -36,7 +36,19 @@ pipeline {
             }
         }
 
-        stage('STEP 2: VALIDATE MANIFESTS'){
+        stage('STEP 2: MINIKUBE CONFIGURATION'){
+            steps{
+                sh """
+                    kubectl config view      
+                    kubectl config current-context
+                    ls -l /var/run/secrets/kubernetes.io/serviceaccount   
+                """
+            }
+        }
+
+ 
+
+        stage('STEP 3: VALIDATE MANIFESTS'){
             steps{    
 
                 sh """
@@ -49,7 +61,7 @@ pipeline {
                              
         }
 
-        stage('STEP 3: CLEANUP CONFIG MAPS'){
+        stage('STEP 4: CLEANUP CONFIG MAPS'){
             steps{    
 
                 sh """
@@ -64,7 +76,7 @@ pipeline {
         }          
        
 
-        stage('STEP 4: CREATE CONFIGMAPS'){
+        stage('STEP 5: CREATE CONFIGMAPS'){
             steps{    
 
                 sh """
@@ -85,7 +97,7 @@ pipeline {
                              
         }
 
-        stage('STEP 3: DEPLOYMENT'){
+        stage('STEP 6: DEPLOYMENT'){
             steps{     
                 sh '''
                     echo "Deploying MySQL to Minikube..."
@@ -106,7 +118,7 @@ pipeline {
 
 
         
-        stage('STEP 3: VERIFY DEPLOYMENT'){
+        stage('STEP 7: VERIFY DEPLOYMENT'){
             steps{     
                 sh '''
                     echo "Verifying MySQL deployment..."
