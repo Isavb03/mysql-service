@@ -39,11 +39,39 @@ pipeline {
         stage('STEP 2: MINIKUBE CONFIGURATION'){
             steps{
                 sh """
-                    kubectl config view      
+                    # Switch to Minikube context
+                    export KUBECONFIG=/home/jenkins/.kube/config
+                    
+                    echo "Current context after switching:"
                     kubectl config current-context
+                    kubectl config view      
                     ls -l /var/run/secrets/kubernetes.io/serviceaccount
-                    export KUBECONFIG=/home/jenkins/.kube/config   
                 """
+            }
+        }
+
+        stage('Cluster Information') {
+            steps {
+                sh '''
+                    echo "=== CLUSTER INFORMATION ==="
+                    echo "Current context:"
+                    kubectl config current-context
+                    
+                    echo "Cluster info:"
+                    kubectl cluster-info
+                    
+                    echo "Available namespaces:"
+                    kubectl get namespaces
+                    
+                    echo "Current namespace:"
+                    cat /var/run/secrets/kubernetes.io/serviceaccount/namespace || echo "default"
+                    
+                    echo "Jenkins service account permissions:"
+                    kubectl auth can-i '*' '*' || echo "Limited permissions"
+                    kubectl auth can-i create pods || echo "Cannot create pods"
+                    kubectl auth can-i create services || echo "Cannot create services"
+                    kubectl auth can-i create configmaps || echo "Cannot create configmaps"
+                '''
             }
         }
 
