@@ -41,7 +41,8 @@ pipeline {
                 sh """
                     kubectl config view      
                     kubectl config current-context
-                    ls -l /var/run/secrets/kubernetes.io/serviceaccount   
+                    ls -l /var/run/secrets/kubernetes.io/serviceaccount
+                    export KUBECONFIG=/home/jenkins/.kube/config   
                 """
             }
         }
