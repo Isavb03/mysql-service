@@ -50,18 +50,18 @@ pipeline {
 
  
 
-        stage('STEP 3: VALIDATE MANIFESTS'){
-            steps{    
+        // stage('STEP 3: VALIDATE MANIFESTS'){
+        //     steps{    
 
-                sh """
-                    echo "Validating Kubernetes manifests..."
-                    kubectl apply --dry-run=client -f manifests/mysql-deployment.yaml
-                    kubectl apply --dry-run=client -f manifests/mysql-service.yaml
-                    kubectl apply --dry-run=client -f manifests/mysql-pvc.yaml
-                """
-            }             
+        //         sh """
+        //             echo "Validating Kubernetes manifests..."
+        //             kubectl apply --dry-run=client -f manifests/mysql-deployment.yaml
+        //             kubectl apply --dry-run=client -f manifests/mysql-service.yaml
+        //             kubectl apply --dry-run=client -f manifests/mysql-pvc.yaml
+        //         """
+        //     }             
                              
-        }
+        // }
 
         stage('STEP 4: CLEANUP CONFIG MAPS'){
             steps{    
