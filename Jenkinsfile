@@ -40,12 +40,33 @@ pipeline {
         stage('STEP 3: VALIDATE MANIFESTS'){
             steps{    
 
-                sh """
-                    echo "Validating Kubernetes manifests..."
-                    kubectl apply --dry-run=client --validate=false -f manifests/mysql-deployment.yaml
-                    kubectl apply --dry-run=client --validate=false -f manifests/mysql-service.yaml
-                    kubectl apply --dry-run=client --validate=false -f manifests/mysql-pvc.yaml
-                """
+                sh '''
+                echo "Setting up in-cluster kubeconfig..."
+                
+                export KUBECONFIG=/tmp/in-cluster-kubeconfig
+                
+                kubectl config set-cluster in-cluster \
+                    --server=https://kubernetes.default.svc \
+                    --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
+                    --embed-certs=true \
+                    --kubeconfig=$KUBECONFIG
+
+                kubectl config set-credentials jenkins \
+                    --token=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
+                    --kubeconfig=$KUBECONFIG
+
+                kubectl config set-context default \
+                    --cluster=in-cluster \
+                    --user=jenkins \
+                    --kubeconfig=$KUBECONFIG
+
+                kubectl config use-context default --kubeconfig=$KUBECONFIG
+
+                echo "Validating manifests with discovery-based resolution..."
+                kubectl apply --dry-run=client --validate=false -f manifests/mysql-deployment.yaml --kubeconfig=$KUBECONFIG
+                kubectl apply --dry-run=client --validate=false -f manifests/mysql-service.yaml --kubeconfig=$KUBECONFIG
+                kubectl apply --dry-run=client --validate=false -f manifests/mysql-pvc.yaml --kubeconfig=$KUBECONFIG
+                '''
             }             
                              
         }
