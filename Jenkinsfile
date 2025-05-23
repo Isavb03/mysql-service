@@ -39,7 +39,7 @@ pipeline {
         stage('STEP 2: MINIKUBE CONFIGURATION'){
             steps{
                 sh """
-                    # export KUBECONFIG=/home/jenkins/.kube/config   
+                    export KUBECONFIG=/home/jenkins/.kube/config   
                     kubectl config view      
                     kubectl config current-context
                     ls -l /var/run/secrets/kubernetes.io/serviceaccount
