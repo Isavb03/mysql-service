@@ -26,6 +26,13 @@ pipeline {
         pollSCM('*/1 * * * *')
     }
 
+    environment {
+        KUBECONFIG = "/tmp/in-cluster-kubeconfig"
+        CLUSTER_SERVER = "https://kubernetes.default.svc"
+        SERVICE_ACCOUNT_CA = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+        SERVICE_ACCOUNT_TOKEN = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+    }
+
     stages {
        
         stage('Step 1: LOAD SCM'){
@@ -35,32 +42,42 @@ pipeline {
 
             }
         }
+
+        stage('STEP 2: SETUP KUBECONFIG') {
+            steps {
+                sh '''
+                echo "Setting up kubeconfig..."
+                
+                kubectl config set-cluster in-cluster \
+                    --server=${CLUSTER_SERVER} \
+                    --certificate-authority=${SERVICE_ACCOUNT_CA} \
+                    --embed-certs=true \
+                    --kubeconfig=${KUBECONFIG}
+
+                kubectl config set-credentials jenkins \
+                    --token=$(cat ${SERVICE_ACCOUNT_TOKEN}) \
+                    --kubeconfig=${KUBECONFIG}
+
+                kubectl config set-context default \
+                    --cluster=in-cluster \
+                    --user=jenkins \
+                    --kubeconfig=${KUBECONFIG}
+
+                kubectl config use-context default --kubeconfig=${KUBECONFIG}
+
+                echo "Current context:"
+                kubectl config current-context --kubeconfig=${KUBECONFIG}
+                '''
+            }
+        }
+
+
  
 
         stage('STEP 3: VALIDATE MANIFESTS'){
             steps{    
 
                 sh '''
-                echo "Setting up in-cluster kubeconfig..."
-                
-                export KUBECONFIG=/tmp/in-cluster-kubeconfig
-                
-                kubectl config set-cluster in-cluster \
-                    --server=https://kubernetes.default.svc \
-                    --certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
-                    --embed-certs=true \
-                    --kubeconfig=$KUBECONFIG
-
-                kubectl config set-credentials jenkins \
-                    --token=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
-                    --kubeconfig=$KUBECONFIG
-
-                kubectl config set-context default \
-                    --cluster=in-cluster \
-                    --user=jenkins \
-                    --kubeconfig=$KUBECONFIG
-
-                kubectl config use-context default --kubeconfig=$KUBECONFIG
 
                 echo "Validating manifests with discovery-based resolution..."
                 kubectl apply --dry-run=client --validate=false -f manifests/mysql-deployment.yaml --kubeconfig=$KUBECONFIG
