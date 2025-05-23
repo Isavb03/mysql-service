@@ -43,6 +43,11 @@ pipeline {
                     kubectl config view      
                     kubectl config current-context
                     ls -l /var/run/secrets/kubernetes.io/serviceaccount
+                    echo "PATH: $PATH"
+                    which kubectl
+                    kubectl version --client
+                    echo "KUBECONFIG: $KUBECONFIG"
+                    kubectl config view
 
                 """
             }
@@ -50,18 +55,18 @@ pipeline {
 
  
 
-        // stage('STEP 3: VALIDATE MANIFESTS'){
-        //     steps{    
+        stage('STEP 3: VALIDATE MANIFESTS'){
+            steps{    
 
-        //         sh """
-        //             echo "Validating Kubernetes manifests..."
-        //             kubectl apply --dry-run=client -f manifests/mysql-deployment.yaml
-        //             kubectl apply --dry-run=client -f manifests/mysql-service.yaml
-        //             kubectl apply --dry-run=client -f manifests/mysql-pvc.yaml
-        //         """
-        //     }             
+                sh """
+                    echo "Validating Kubernetes manifests..."
+                    kubectl apply --dry-run=client -f manifests/mysql-deployment.yaml
+                    kubectl apply --dry-run=client -f manifests/mysql-service.yaml
+                    kubectl apply --dry-run=client -f manifests/mysql-pvc.yaml
+                """
+            }             
                              
-        // }
+        }
 
         stage('STEP 4: CLEANUP CONFIG MAPS'){
             steps{    
