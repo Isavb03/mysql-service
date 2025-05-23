@@ -35,24 +35,6 @@ pipeline {
 
             }
         }
-
-        stage('STEP 2: MINIKUBE CONFIGURATION'){
-            steps{
-                sh """
-                    # export KUBECONFIG=/home/jenkins/.kube/config   
-                    kubectl config view      
-                    kubectl config current-context
-                    ls -l /var/run/secrets/kubernetes.io/serviceaccount
-                    # echo "PATH: $PATH"
-                    # which kubectl
-                    # kubectl version --client
-                    # echo "KUBECONFIG: $KUBECONFIG"
-                    # kubectl config view
-
-                """
-            }
-        }
-
  
 
         stage('STEP 3: VALIDATE MANIFESTS'){
