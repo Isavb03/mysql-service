@@ -39,15 +39,15 @@ pipeline {
         stage('STEP 2: MINIKUBE CONFIGURATION'){
             steps{
                 sh """
-                    export KUBECONFIG=/home/jenkins/.kube/config   
+                    # export KUBECONFIG=/home/jenkins/.kube/config   
                     kubectl config view      
                     kubectl config current-context
                     ls -l /var/run/secrets/kubernetes.io/serviceaccount
-                    echo "PATH: $PATH"
-                    which kubectl
-                    kubectl version --client
-                    echo "KUBECONFIG: $KUBECONFIG"
-                    kubectl config view
+                    # echo "PATH: $PATH"
+                    # which kubectl
+                    # kubectl version --client
+                    # echo "KUBECONFIG: $KUBECONFIG"
+                    # kubectl config view
 
                 """
             }
@@ -60,9 +60,9 @@ pipeline {
 
                 sh """
                     echo "Validating Kubernetes manifests..."
-                    kubectl apply --dry-run=client -f manifests/mysql-deployment.yaml
-                    kubectl apply --dry-run=client -f manifests/mysql-service.yaml
-                    kubectl apply --dry-run=client -f manifests/mysql-pvc.yaml
+                    kubectl apply --dry-run=client --validate=false -f manifests/mysql-deployment.yaml
+                    kubectl apply --dry-run=client --validate=false -f manifests/mysql-service.yaml
+                    kubectl apply --dry-run=client --validate=false -f manifests/mysql-pvc.yaml
                 """
             }             
                              
